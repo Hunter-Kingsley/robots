@@ -188,6 +188,42 @@ int GraemeShip::SetupShip() {
     return Finalize();
 }
 
+int HuntitroniousPrime::SetupShip() {
+    SCAN();
+    IF_SEEN() {
+        IF_SCAN_LE(600) {
+            TURN_DEG(45);
+            THRUST(3);
+        }
+        IF_SCAN_LE(300) {
+            TURN_TO_SCAN();
+            IF_SHIP_CAN_FIRE_PHOTON() {
+                FIRE_PHOTON();
+            }
+            IF_SHIP_CAN_FIRE_PHASER() {
+                FIRE_PHASER();
+            }
+        }
+        THRUST(3);
+    }
+    IF_SHIP_HP_LE(6) {  // Emergency threshold
+        THRUST(1);
+    }
+    IF_SHIP_FUEL_LE(35) {
+        SCAN();
+        IF_SCAN_LE(300) {  // Increased from 100
+            TURN_TO_SCAN();
+            IF_SHIP_CAN_FIRE_PHOTON() {
+                FIRE_PHOTON();
+            }
+            IF_SHIP_CAN_FIRE_PHASER() {
+                FIRE_PHASER();
+            }
+        }
+    }
+    return Finalize();
+}
+
 // ===== AstroBots game implementation =====
 AstroBots::AstroBots() {
     _currentTurn = 0;
@@ -203,6 +239,7 @@ std::vector<std::unique_ptr<ShipBase>> AstroBots::makeShips() {
     v.emplace_back(std::make_unique<DroneShip>());
     v.emplace_back(std::make_unique<MinerShip>());
     v.emplace_back(std::make_unique<GraemeShip>());
+    v.emplace_back(std::make_unique<HuntitroniousPrime>());
     return v;
 }
 
